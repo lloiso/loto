@@ -1,48 +1,62 @@
 import kotlin.random.Random
 
 class Lotto {
-    // определите поле, в котром будут храниться добавленные игроки `Person`
-    val personList: MutableList<Person> = mutableListOf()
 
-    // поле thrownNumbers должно хранить в себе набор выброшенных чисел.
-    // определите подходящую структуру данных
-    val thrownNumbers: MutableList<Int> = mutableListOf()
+    private val persons: MutableList<Person> = mutableListOf()
+    val thrownNumbers: MutableSet<Int> = mutableSetOf()
 
     fun addPerson(person: Person) {
-        personList.add(person) // добавить игрока в список игроков
+        persons.add(person)
     }
 
     fun start() {
-        // вывести сообщение "Перед началом игры необходимо добавить хотя бы двух игроков" и завершить работу,
-        // если количество добавленных игроков меньше 2
-        var final: Boolean = false
-        var number: Int
-        var winnersList: MutableList<Person> = mutableListOf()
+        if (persons.size < 2) {
+            println("Перед началом игры необходимо добавить хотя бы двух игроков")
+        } else {
+            do {
+                val number = throwNumber()
 
-        if (personList.size > 1) {
-            // выбрасывать новые числа до тех пор, пока не определится победитель
-            while (!final) {
-                // достать номер. Номер может быть в диапазоне от 1 до 99 включительно
-                number = Random.nextInt()
-
-                // после каждого выброшенного числа удалять это число из карточек всех игроков, если такое число имеется
-                thrownNumbers.add(number)
-
-                for (i in 0..personList.lastIndex) {
-                    personList[i].findAndRemove(number)
-                    if (personList[i].card.numbers.isEmpty()){
-                        winnersList.add(personList[i])
-                        final = true
+                for (person in persons) {
+                    val cardNumbers = person.card.numbers
+                    for (key in cardNumbers.keys) {
+                        cardNumbers[key]?.remove(number)
                     }
                 }
-                // побеждает тот, у кого в одном из рядов нет больше чисел. Победителей может быть более одного
-            }
-            if (winnersList.isNotEmpty()){
-                for (i in 0..winnersList.lastIndex){
-                    println("Победитель: ${winnersList[i]}!!!")
+            } while (!hasWinners())
+        }
+    }
+
+    private fun throwNumber(): Int {
+        val number = Random.nextInt(1, 100)
+
+        return if (thrownNumbers.contains(number)) {
+            throwNumber()
+        } else {
+            thrownNumbers.add(number)
+            println("Выброшенное число: $number")
+            number
+        }
+    }
+
+    private fun hasWinners(): Boolean {
+        val winners: MutableList<Person> = mutableListOf()
+
+        for (person in persons) {
+            val cardNumbers = person.card.numbers
+            for (key in cardNumbers.keys) {
+                if (cardNumbers[key]?.isEmpty() == true) {
+                    winners.add(person)
                 }
             }
-            // после того как появляется победитель, для каждого победителя вывести текст "Победитель: [имя_победителя]!!!"
-        } else println("Перед началом игры необходимо добавить хотя бы двух игроков")
+        }
+
+        return if (winners.isEmpty()) {
+            false
+        } else {
+            for (winner in winners) {
+                println("Победитель: ${winner.name}!!!")
+            }
+            true
+        }
     }
 }

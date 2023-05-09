@@ -1,2 +1,1 @@
-class Card(var numbers: MutableMap<Int, MutableSet<Int>>) {
-}
+class Card(val numbers: Map<Int, MutableSet<Int>>)

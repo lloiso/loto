@@ -1,6 +1,7 @@
 import kotlin.random.Random
 import kotlin.random.nextInt
 
+
 class Person(val name: String) {
 
     val card: Card = createCard()
@@ -39,12 +40,6 @@ class Person(val name: String) {
         }
 
         return numbers
-    }
-
-    fun findAndRemove(number: Int) {
-        if (card.numbers.contains(number)) {
-            card.numbers.remove(number)
-        }
     }
 
     private companion object {
